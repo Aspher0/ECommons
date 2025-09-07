@@ -24,6 +24,10 @@ public partial class TaskManager : IDisposable
     /// </summary>
     public bool AbortOnTimeout = false;
     /// <summary>
+    /// Callback to call when task manager times out.
+    /// </summary>
+    public Action? CallbackOnTimeout = null;
+    /// <summary>
     /// Tick count (<see cref="Environment.TickCount64"/>) at which current task will be aborted
     /// </summary>
     public long AbortAt { get; private set; } = 0;
@@ -156,6 +160,7 @@ public partial class TaskManager : IDisposable
                             LogTimeout($"Clearing {Tasks.Count} remaining tasks because of timeout");
                             Tasks.Clear();
                             ImmediateTasks.Clear();
+                            CallbackOnTimeout?.Invoke();
                         }
                         throw new TimeoutException($"Task {CurrentTask.Name ?? CurrentTask.Action.GetMethodInfo()?.Name} took too long to execute");
                     }
